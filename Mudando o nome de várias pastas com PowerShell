@@ -1,0 +1,40 @@
+Aqui eu vou colocar um passo a passo de um truque bem simples, porém bem útil.
+
+Recentemente eu tive que fazer uma tarefa bem simples e bem chata. Mudar o nome de umas pastas no meu computador que eram nomeadas com datas no formato MM.AAAA (ou seja 03.2024). Isso é meio ruim porque quando você ordena por ordem alfabética a ordem não fica cronológica. 
+De toda forma, eu teria que alterar os nomes das pastas individualmente, uma a uma. Por sorte, tem como fazer isso de forma automatizada - de várias formas.
+
+Aqui eu vou mostrar de forma simples como fazer isso usando o PowerShell. 
+
+1. Primeiro vá a pasta de interesse. 
+2. Aperte Shift e clique com o botão direito em algum lugar vazio da pasta. 
+3. Selecione a opção "Abrir janela do PowerShell aqui". 
+4. Insira o código a seguir: 
+
+# Lista todos os itens do diretório atual que são pastas (não arquivos)
+Get-ChildItem -Directory |
+
+# Para cada pasta encontrada, executa o bloco de código abaixo
+ForEach-Object {
+
+    # Verifica se o nome da pasta corresponde ao padrão "MM.AAAA"
+    # ^       => início da string
+    # (\d{2}) => captura dois dígitos (MM)
+    # \.      => literal ponto
+    # (\d{4}) => captura quatro dígitos (AAAA)
+    # $       => fim da string
+    if ($_ -match '^(\d{2})\.(\d{4})$') {
+
+        # Extrai o mês (MM) do primeiro grupo da regex
+        $mm = $matches[1]
+
+        # Extrai o ano (AAAA) do segundo grupo da regex
+        $yyyy = $matches[2]
+
+        # Monta o novo nome da pasta no formato "AAAA.MM"
+        $newName = "$yyyy.$mm"
+
+        # Renomeia a pasta original para o novo nome
+        Rename-Item $_.FullName -NewName $newName
+    }
+}
+
